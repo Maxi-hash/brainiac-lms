@@ -1,11 +1,8 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsEmail, IsString, IsEnum, IsBoolean, IsObject, IsOptional } from 'class-validator';
-import { UserRole } from '../../auth/entities/user.entity';
+import { IsEmail, IsString, IsEnum, IsOptional, IsUUID, IsObject } from 'class-validator';
+import { UserRole } from '../entities/user.entity';
 
-export class UserResponseDto {
-  @ApiProperty({ example: '123e4567-e89b-12d3-a456-426614174000' })
-  id: string;
-
+export class CreateUserDto {
   @ApiProperty({ example: 'john.doe@example.com' })
   @IsEmail()
   email: string;
@@ -18,24 +15,23 @@ export class UserResponseDto {
   @IsString()
   lastName: string;
 
-  @ApiProperty({ enum: UserRole, example: UserRole.STUDENT })
+  @ApiProperty({ example: 'password123' })
+  @IsString()
+  password: string;
+
+  @ApiProperty({ enum: UserRole })
   @IsEnum(UserRole)
   role: UserRole;
 
-  @ApiProperty({ example: true })
-  @IsBoolean()
-  isEmailVerified: boolean;
-
-  @ApiProperty({
-    example: {
-      language: 'en',
-      theme: 'light',
-      notifications: { email: true, push: false }
-    }
-  })
-  @IsObject()
+  @ApiProperty({ required: false })
+  @IsString()
   @IsOptional()
-  preferences?: Record<string, any>;
+  section?: string;
+
+  @ApiProperty({ required: false })
+  @IsUUID()
+  @IsOptional()
+  managerId?: string;
 }
 
 export class UpdateUserDto {
@@ -50,7 +46,24 @@ export class UpdateUserDto {
   lastName?: string;
 
   @ApiProperty({ required: false })
+  @IsString()
+  @IsOptional()
+  section?: string;
+
+  @ApiProperty({ required: false })
+  @IsUUID()
+  @IsOptional()
+  managerId?: string;
+
+  @ApiProperty({ required: false })
   @IsObject()
   @IsOptional()
-  preferences?: Record<string, any>;
+  preferences?: {
+    notifications?: {
+      contentUpdates?: boolean;
+      peerFeedback?: boolean;
+      managerApproval?: boolean;
+    };
+    defaultSection?: string;
+  };
 }
